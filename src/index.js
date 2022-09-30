@@ -5,60 +5,87 @@ import { GraphQLServer } from "graphql-yoga";
 
 // Demo user data
 const users = [
-  {
-    id: 1,
-    name: "Matt",
-    email: "matt@email.com",
-    age: 39
-  },
-  {
-    id: 2,
-    name: "Sarah",
-    email: "sarah@email.com",
-  },
-  {
-    id: 3,
-    name: "Chris",
-    email: "chris@email.com",
-    age: 38
-  },
-]
+	{
+		id: 101,
+		name: "Matt",
+		email: "matt@email.com",
+		age: 39,
+	},
+	{
+		id: 102,
+		name: "Sarah",
+		email: "sarah@email.com",
+	},
+	{
+		id: 103,
+		name: "Chris",
+		email: "chris@email.com",
+		age: 38,
+	},
+];
 
 const posts = [
 	{
-		id: 1,
+		id: 201,
 		title: "My first post",
 		body: "Abcde",
 		published: true,
-		author: 1,
+		author: 101,
 	},
 	{
-		id: 2,
+		id: 202,
 		title: "My second post",
 		body: "fghij",
 		published: false,
-		author: 2,
+		author: 102,
 	},
 	{
-		id: 3,
+		id: 203,
 		title: "My third post",
 		body: "klmno",
 		published: true,
-		author: 1,
+		author: 101,
 	},
 	{
-		id: 4,
+		id: 204,
 		title: "My fourth post",
 		body: "pqrst",
 		published: false,
-		author: 2,
+		author: 102,
 	},
 	{
-		id: 5,
+		id: 205,
 		title: "My fifth post",
 		body: "uvwxy",
 		published: true,
-		author: 1,
+		author: 101,
+	},
+];
+
+const comments = [
+	{
+		id: 301,
+		text: "Comment number one",
+		author: 101,
+    post: 202,
+	},
+	{
+		id: 302,
+		text: "The second comment",
+		author: 102,
+    post: 203,
+	},
+	{
+		id: 303,
+		text: "Third comment goes here",
+		author: 103,
+    post: 204,
+	},
+	{
+		id: 304,
+		text: "This is the fourth comment",
+		author: 101,
+    post: 201,
 	},
 ];
 
@@ -66,9 +93,10 @@ const posts = [
 const typeDefs = `
   type Query {
     users(query: String): [User!]!
+    posts(query: String): [Post!]!
+    comments: [Comment!]!
     me: User!
     post: Post!
-    posts(query:String): [Post!]!
   }
 
   type User {
@@ -76,6 +104,8 @@ const typeDefs = `
     name: String!
     email: String!
     age: Int
+    posts: [Post!]!
+    comments: [Comment]!
   }
 
   type Post {
@@ -84,6 +114,14 @@ const typeDefs = `
     body: String!
     published: Boolean!
     author: User!
+    comments: [Comment!]!
+  }
+
+  type Comment {
+    id: ID!
+    text: String!
+    author: User!
+    post: Post!
   }
 
 `;
@@ -91,15 +129,15 @@ const typeDefs = `
 // Resolvers
 const resolvers = {
 	Query: {
-    users(parent, args, context, info) {
-      if (!args.query) {
-        return users
-      }
+		users(parent, args, context, info) {
+			if (!args.query) {
+				return users;
+			}
 
-      return users.filter((user) => {
-        return user.name.toLowerCase().includes(args.query.toLowerCase())
-      })
-    },
+			return users.filter((user) => {
+				return user.name.toLowerCase().includes(args.query.toLowerCase());
+			});
+		},
 		me() {
 			return {
 				id: "123098",
@@ -116,26 +154,46 @@ const resolvers = {
 				published: true,
 			};
 		},
-    posts(parent, args, context, info) {
-      if (!args.query) {
-        return posts
-      }
+		posts(parent, args, context, info) {
+			if (!args.query) {
+				return posts;
+			}
 
-      return posts.filter((post) => {
-        return (
+			return posts.filter((post) => {
+				return (
 					post.title.toLowerCase().includes(args.query.toLowerCase()) ||
 					post.body.toLowerCase().includes(args.query.toLowerCase())
 				);
-      })
+			});
+		},
+		comments(parent, args, context, info) {
+			return comments;
+		},
+	},
+	Post: {
+		author(parent, args, context, info) {
+			return users.find((user) => user.id === parent.author);
+		},
+		comments(parent, args, context, info) {
+			return comments.filter((comment) => comment.post === parent.id);
+		},
+	},
+	User: {
+		posts(parent, args, context, info) {
+			return posts.filter((post) => post.author === parent.id);
+		},
+		comments(parent, args, context, info) {
+			return comments.filter((comment) => comment.author === parent.id);
+		},
+	},
+	Comment: {
+		author(parent, args, context, info) {
+			return users.find((user) => user.id === parent.author);
+		},
+    post(parent, args, context, info) {
+      return posts.find((post) => post.id === parent.post)
     }
 	},
-  Post: {
-    author(parent, args, context, info) {
-      return users.find((user) => {
-        return user.id === parent.author
-      })
-    }
-  }
 };
 
 const server = new GraphQLServer({
