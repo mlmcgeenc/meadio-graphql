@@ -1,4 +1,5 @@
 import { GraphQLServer } from "graphql-yoga";
+import { v4 as uuidv4 } from "uuid";
 
 // Scalar Types
 //  String, Boolean, Int, Float, ID
@@ -6,18 +7,18 @@ import { GraphQLServer } from "graphql-yoga";
 // Demo user data
 const users = [
 	{
-		id: 101,
+		id: "101",
 		name: "Matt",
 		email: "matt@email.com",
 		age: 39,
 	},
 	{
-		id: 102,
+		id: "102",
 		name: "Sarah",
 		email: "sarah@email.com",
 	},
 	{
-		id: 103,
+		id: "103",
 		name: "Chris",
 		email: "chris@email.com",
 		age: 38,
@@ -26,66 +27,66 @@ const users = [
 
 const posts = [
 	{
-		id: 201,
+		id: "201",
 		title: "My first post",
 		body: "Abcde",
 		published: true,
-		author: 101,
+		author: "101",
 	},
 	{
-		id: 202,
+		id: "202",
 		title: "My second post",
 		body: "fghij",
 		published: false,
-		author: 102,
+		author: "102",
 	},
 	{
-		id: 203,
+		id: "203",
 		title: "My third post",
 		body: "klmno",
 		published: true,
-		author: 101,
+		author: "101",
 	},
 	{
-		id: 204,
+		id: "204",
 		title: "My fourth post",
 		body: "pqrst",
 		published: false,
-		author: 102,
+		author: "102",
 	},
 	{
-		id: 205,
+		id: "205",
 		title: "My fifth post",
 		body: "uvwxy",
 		published: true,
-		author: 101,
+		author: "101",
 	},
 ];
 
 const comments = [
 	{
-		id: 301,
+		id: "301",
 		text: "Comment number one",
-		author: 101,
-    post: 202,
+		author: "101",
+		post: "202",
 	},
 	{
-		id: 302,
+		id: "302",
 		text: "The second comment",
-		author: 102,
-    post: 203,
+		author: "102",
+		post: "203",
 	},
 	{
-		id: 303,
+		id: "303",
 		text: "Third comment goes here",
-		author: 103,
-    post: 204,
+		author: "103",
+		post: "204",
 	},
 	{
-		id: 304,
+		id: "304",
 		text: "This is the fourth comment",
-		author: 101,
-    post: 201,
+		author: "101",
+		post: "201",
 	},
 ];
 
@@ -97,6 +98,12 @@ const typeDefs = `
     comments: [Comment!]!
     me: User!
     post: Post!
+  }
+
+  type Mutation {
+    createUser(name: String!, email: String!, age: Int): User!
+    createPost(title: String!, body: String!, published: Boolean!, author: ID!): Post!
+    createComment(text: String!, author: ID!, post: ID!): Comment!
   }
 
   type User {
@@ -170,6 +177,78 @@ const resolvers = {
 			return comments;
 		},
 	},
+	Mutation: {
+		createUser(parent, { name, email, age }, context, info) {
+			const emailTaken = users.some((user) => user.email === email);
+
+			if (emailTaken) {
+				throw new Error(
+					"Emaill address provided is already in use by an existing user account."
+				);
+			}
+
+			const user = {
+				id: uuidv4(),
+				name,
+				email,
+				age,
+			};
+
+			users.push(user);
+
+			return user;
+		},
+		createPost(parent, { title, body, published, author }, context, info) {
+			const userExists = users.some((user) => user.id === author);
+
+			if (!userExists) {
+				throw new Error("User not found.");
+			}
+
+			const post = {
+				id: uuidv4(),
+				title,
+				body,
+				published,
+				author,
+			};
+
+			posts.push(post);
+
+			return post;
+		},
+		createComment(parent, args, context, info) {
+      console.log(args)
+      const userExists = users.some((user) => user.id === args.author)
+      const postExists = posts.some((post) => {
+        return post.id === args.post && post.published
+      })
+
+      if(!userExists) {
+        throw new Error(
+          "User not found."
+        )
+      }
+
+      if(!postExists) {
+        throw new Error(
+          "Post does not exist."
+        )
+      }
+      
+
+      const comment = {
+        id: uuidv4(),
+        text: args.text,
+        author: args.author,
+        post: args.post
+      }
+
+      comments.push(comment)
+
+      return comment
+		},
+	},
 	Post: {
 		author(parent, args, context, info) {
 			return users.find((user) => user.id === parent.author);
@@ -190,9 +269,9 @@ const resolvers = {
 		author(parent, args, context, info) {
 			return users.find((user) => user.id === parent.author);
 		},
-    post(parent, args, context, info) {
-      return posts.find((post) => post.id === parent.post)
-    }
+		post(parent, args, context, info) {
+			return posts.find((post) => post.id === parent.post);
+		},
 	},
 };
 
