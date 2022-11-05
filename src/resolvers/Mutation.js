@@ -114,14 +114,14 @@ const Mutation = {
 			if (originalPost.published && !post.published) {
 				pubsub.publish("post", {
 					post: {
-						mutation: "UPDATE - UNPUBLISHED",
+						mutation: "DELETED",
 						data: originalPost,
 					},
 				});
 			} else if (!originalPost.published && post.published) {
 				pubsub.publish("post", {
 					post: {
-						mutation: "UPDATE - PUBLISHED",
+						mutation: "CREATED",
 						data: post,
 					},
 				});
@@ -129,7 +129,7 @@ const Mutation = {
 		} else if (post.published) {
 			pubsub.publish("post", {
 				post: {
-					mutation: "UPDATED - CONTENT",
+					mutation: "UPDATED",
 					data: post,
 				},
 			});
