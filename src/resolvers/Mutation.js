@@ -120,18 +120,14 @@ const Mutation = {
 
 		return deletedPost[0];
 	},
-	createComment(parent, args, context, info) {
+	createComment(parent, args, { db, pubsub }, info) {
 		const userExists = db.users.some((user) => user.id === args.data.author);
 		const postExists = db.posts.some((post) => {
 			return post.id === args.data.post && post.published;
 		});
 
-		if (!userExists) {
-			throw new Error("User not found.");
-		}
-
-		if (!postExists) {
-			throw new Error("Post does not exist.");
+		if (!userExists || !postExists) {
+			throw new Error("User or post not found.");
 		}
 
 		const comment = {
@@ -140,6 +136,7 @@ const Mutation = {
 		};
 
 		db.comments.push(comment);
+    pubsub.publish(`comment ${args.data.post}`, { comment: comment })
 
 		return comment;
 	},
