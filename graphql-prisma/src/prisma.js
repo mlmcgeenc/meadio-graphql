@@ -80,10 +80,10 @@ const updatePostForUser = async (postId, data) => {
 	return post;
 };
 
-updatePostForUser("clag03ac2000z0f595sj2math", {
-	title: "Updated title5",
-	body: "Updated Body5",
-	published: true,
-})
-	.then((user) => console.log(JSON.stringify(user, undefined, 2)))
-	.catch((error) => console.log(error.message));
+// updatePostForUser("clag03ac2000z0f595sj2math", {
+// 	title: "Updated title5",
+// 	body: "Updated Body5",
+// 	published: true,
+// })
+// 	.then((user) => console.log(JSON.stringify(user, undefined, 2)))
+// 	.catch((error) => console.log(error.message));
