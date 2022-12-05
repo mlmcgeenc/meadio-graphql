@@ -5,6 +5,8 @@ const prisma = new Prisma({
 	endpoint: "http://localhost:4466",
 });
 
+export { prisma as default }
+
 // prisma.query
 // prisma.mutation
 // prisma.subscription
@@ -18,31 +20,31 @@ const prisma = new Prisma({
 // 		console.log(exists);
 // 	});
 
-const createPostForUser = async (authorId, data) => {
-	const userExists = await prisma.exists.User({
-		id: authorId,
-	});
+// const createPostForUser = async (authorId, data) => {
+// 	const userExists = await prisma.exists.User({
+// 		id: authorId,
+// 	});
 
-	if (!userExists) {
-		throw new Error("User Not Found");
-	}
+// 	if (!userExists) {
+// 		throw new Error("User Not Found");
+// 	}
 
-	const post = await prisma.mutation.createPost(
-		{
-			data: {
-				...data,
-				author: {
-					connect: {
-						id: authorId,
-					},
-				},
-			},
-		},
-		"{ author { name email posts{ id title published } } }"
-	);
+// 	const post = await prisma.mutation.createPost(
+// 		{
+// 			data: {
+// 				...data,
+// 				author: {
+// 					connect: {
+// 						id: authorId,
+// 					},
+// 				},
+// 			},
+// 		},
+// 		"{ author { name email posts{ id title published } } }"
+// 	);
 
-	return post.author;
-};
+// 	return post.author;
+// };
 
 // createPostForUser("cla9x5ep401h00f60nfzxav20", {
 // 	title: "Great books to read",
@@ -56,29 +58,29 @@ const createPostForUser = async (authorId, data) => {
 // 		console.log(error.message);
 // 	});
 
-const updatePostForUser = async (postId, data) => {
-	const postExists = await prisma.exists.Post({
-		id: postId,
-	});
+// const updatePostForUser = async (postId, data) => {
+// 	const postExists = await prisma.exists.Post({
+// 		id: postId,
+// 	});
 
-	if (!postExists) {
-		throw new Error("Post not found");
-	}
+// 	if (!postExists) {
+// 		throw new Error("Post not found");
+// 	}
 
-	const post = await prisma.mutation.updatePost(
-		{
-			data: {
-				...data,
-			},
-			where: {
-				id: postId,
-			},
-		},
-		"{ author {name email posts{ id title published } } }"
-	);
+// 	const post = await prisma.mutation.updatePost(
+// 		{
+// 			data: {
+// 				...data,
+// 			},
+// 			where: {
+// 				id: postId,
+// 			},
+// 		},
+// 		"{ author {name email posts{ id title published } } }"
+// 	);
 
-	return post;
-};
+// 	return post;
+// };
 
 // updatePostForUser("clag03ac2000z0f595sj2math", {
 // 	title: "Updated title5",
