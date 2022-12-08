@@ -44,7 +44,6 @@ input UpdatePostInput {
   title: String
   body: String
   published: Boolean
-  author: ID
 }
 
 input CreateCommentInput {
