@@ -14,30 +14,13 @@ const Mutation = {
 
 		return user;
 	},
-	updateUser(parent, { id, data }, { db }, info) {
-		const user = db.users.find((user) => user.id === id);
-		if (!user) {
-			throw new Error("User not found");
-		}
-
-		if (typeof data.email === "string") {
-			const emailTaken = db.users.some((user) => user.email === data.email);
-			if (emailTaken) {
-				throw new Error("Email already in use");
-			}
-
-			user.email = data.email;
-		}
-
-		if (typeof data.name === "string") {
-			user.name = data.name;
-		}
-
-		if (typeof data.age !== "undefined") {
-			user.age = data.age;
-		}
-
-		return user;
+	async updateUser(parent, args, { prisma }, info) {
+    return prisma.mutation.updateUser({
+      where: {
+        id: args.id
+      },
+      data: args.data
+    }, info)
 	},
 	async deleteUser(parent, args, { prisma }, info) {
     const userExists = await prisma.exists.User({ id: args.id })
@@ -50,29 +33,19 @@ const Mutation = {
 
     return user
 	},
-	createPost(parent, args, { db, pubsub }, info) {
-		const userExists = db.users.some((user) => user.id === args.data.author);
-
-		if (!userExists) {
-			throw new Error("User not found.");
-		}
-
-		const post = {
-			id: uuidv4(),
-			...args.data,
-		};
-
-		db.posts.push(post);
-		if (args.data.published) {
-			pubsub.publish(`post`, {
-				post: {
-					mutation: "CREATED",
-					data: post,
-				},
-			});
-		}
-
-		return post;
+	async createPost(parent, args, { prisma }, info) {
+    return prisma.mutation.createPost({ 
+      data: {
+        title: args.data.title,
+        body: args.data.body,
+        published: args.data.published,
+        author: {
+          connect: {
+            id: args.data.author
+          }
+        }
+      }
+    }, info)
 	},
 	updatePost(parent, { id, data }, { db, pubsub }, info) {
 		const post = db.posts.find((post) => post.id === id);
