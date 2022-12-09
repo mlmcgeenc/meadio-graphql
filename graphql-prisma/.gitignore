@@ -3,6 +3,7 @@ DS_Store
 docker-compose.yml
 prisma/
 prisma.js
+prisma.yml
 
 # Logs
 logs
