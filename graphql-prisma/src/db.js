@@ -54,6 +54,12 @@ const posts = [
 		published: true,
 		author: "101",
 	},
+  {
+    id: "206",
+    title: "My sixth post",
+    body: "abcd",
+    author: "101"
+  }
 ];
 
 const comments = [
