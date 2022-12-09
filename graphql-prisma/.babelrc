@@ -1,0 +1,9 @@
+// last edit fri 9
+{
+  "presets": [
+    "env"
+  ],
+  "plugins": [
+    "transform-object-rest-spread"
+  ]
+}
