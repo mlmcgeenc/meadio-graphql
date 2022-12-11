@@ -5,6 +5,8 @@ docker-compose.yml
 prisma/
 prisma.js
 prisma.yml
+generateToken.js
+getUserId.js
 
 # Logs
 logs
