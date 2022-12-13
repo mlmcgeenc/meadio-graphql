@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest --watch",
     "start": "nodemon --ext js,gra src/index.js --exec babel-node",
     "get-schema": "graphql get-schema -p prisma"
   },
@@ -23,6 +23,7 @@
     "prisma-binding": "^2.1.1"
   },
   "devDependencies": {
+    "jest": "^23.5.0",
     "nodemon": "^2.0.20"
   }
 }

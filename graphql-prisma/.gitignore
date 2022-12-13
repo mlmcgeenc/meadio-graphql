@@ -7,6 +7,7 @@ prisma.js
 prisma.yml
 generateToken.js
 getUserId.js
+graphql-prisma/config
 
 # Logs
 logs
